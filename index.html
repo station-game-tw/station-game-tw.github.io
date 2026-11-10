@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>搶修太空站</title>
+<style>
+  html,body{margin:0;height:100%;background:#070b1a;color:#e8ecff;
+    font-family:system-ui,-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+  .box{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;box-sizing:border-box}
+  .sat{font-size:64px}
+  h1{margin:0;font-size:26px}
+  p{margin:0;color:#8d97c7;font-size:16px;line-height:1.6}
+  a{color:#4da3ff;font-size:18px}
+  .dot{animation:b 1s infinite}@keyframes b{50%{opacity:.3}}
+</style>
+</head>
+<body>
+<!--
+  這是固定的入口網址：https://station-game-tw.github.io/
+  QR Code 指向這裡；這頁會讀 url.json，把玩家轉到當下的 Cloudflare 網址。
+  每次重開通道後執行 scripts/update-url.ps1 就會更新 url.json，不用改這個檔案。
+-->
+<div class="box">
+  <div class="sat">🛰️</div>
+  <h1>搶修太空站</h1>
+  <p id="msg">正在連線到太空站<span class="dot">…</span></p>
+  <a id="link" href="#" style="display:none">點這裡進入遊戲</a>
+</div>
+<script>
+fetch('url.json?t=' + Date.now(), { cache: 'no-store' })
+  .then((r) => r.json())
+  .then((d) => {
+    if (!d.url) throw new Error('empty');
+    // .../station-game/#screen → 大螢幕；#admin 不支援（主持人頁不對外）
+    const target = d.url + (location.hash === '#screen' ? 'screen' : '');
+    document.getElementById('link').href = target;
+    document.getElementById('link').style.display = 'inline';
+    location.replace(target);
+  })
+  .catch(() => {
+    document.getElementById('msg').textContent = '遊戲還沒開放，請稍候再掃一次 QR Code';
+  });
+</script>
+</body>
+</html>
